@@ -28,12 +28,21 @@ public class ElectronicsProduct extends Product implements Shippable {
         return warrantyMonths;
     }
     // Returns the weight of the product
-    public BigDecimal getWeight() {
-        return weight;
+    public double getWeight() {
+        return weight.doubleValue();
     }
     // Provides product-specific details, demonstrating polymorphism
     @Override
     public String productDetails() {
         return "Electronics: " + getName() + ", Warranty: " + warrantyMonths + " months";
+    }
+    // Calculates shipping cost for the electronics product
+    @Override
+    public BigDecimal calculateShippingCost() {
+        BigDecimal cost = BigDecimal.valueOf(79); // base cost
+        if (weight.compareTo(BigDecimal.valueOf(5.0)) > 0) {
+            cost = cost.add(BigDecimal.valueOf(49));
+        }
+        return cost;
     }
 }
