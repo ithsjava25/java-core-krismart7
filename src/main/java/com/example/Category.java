@@ -1,6 +1,7 @@
 package com.example;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 public final class Category {
@@ -37,5 +38,33 @@ public final class Category {
         }
         // Return cached instance for the normalized name
         return CACHE.get(normalizedName);
+    }
+
+    // Returns the normalized category name, providing read-only access to the category value
+    public String getName() {
+        return name;
+    }
+
+    // Checks if this Category is equal to another object based on the normalized name
+    // Ensures categories with the same name are considered identical
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Category category = (Category) o;
+        return Objects.equals(name, category.name);
+    }
+
+    // Returns a hash code consistent with equals()
+    // Ensures correct behavior in hash-based collections like maps
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(name);
+    }
+
+    // Returns a read-only representation of the Category
+    // Useful for debugging, logging, and displaying category information
+    @Override
+    public String toString() {
+        return "Category{" + "name='" + name + '\'' + '}';
     }
 }
