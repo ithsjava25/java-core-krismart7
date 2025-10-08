@@ -11,6 +11,12 @@ public class Warehouse {
     // This ensures that even if multiple parts of the program request a warehouse with the same name
     // they all get the same object (singleton per name)
     private static final Map<String, Warehouse> unique = new HashMap<>();
+    private final String name;
+
+    // Private constructor ensures controlled instantiation
+    private Warehouse(String name) {
+        this.name = name;
+    }
 
     // Returns the Warehouse instance for a given name
     // If it already exists, returns the existing instance
@@ -19,4 +25,6 @@ public class Warehouse {
     public static Warehouse getInstance(String name) {
         return unique.computeIfAbsent(name, Warehouse::new);
     }
+
+
 }
