@@ -1,8 +1,7 @@
 package com.example;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.math.BigDecimal;
+import java.util.*;
 
 // Warehouse class that stores products and enforces singleton-per-name
 // Each warehouse is uniquely identified by its nam
@@ -17,6 +16,9 @@ public class Warehouse {
     // Map storing all products by their UUID for fast lookup
     private final Map<UUID, Product> products = new HashMap<>();
 
+    // Set of UUIDs for products that have changed (price updates)
+    private final Set<UUID> changedProducts = new HashSet<>();
+
     // Private constructor ensures controlled instantiation
     private Warehouse(String name) {
         this.name = name;
@@ -30,5 +32,35 @@ public class Warehouse {
         return unique.computeIfAbsent(name, Warehouse::new);
     }
 
+    public String getName() {
+        return name;
+    }
 
+    public Map<UUID, Product> getProducts() {
+        return Collections.unmodifiableMap(products);
+    }
+
+    public Set<UUID> getChangedProducts() {
+        return changedProducts;
+    }
+
+    public void addProduct(Product product) {
+        if (product == null) {
+            throw new IllegalArgumentException("Product cannot be null.");
+        }
+        products.put(product.uuid(), product);
+    }
+
+    public Optional<Product> getProductById(UUID id) {
+        return Optional.ofNullable(products.get(id));
+    }
+
+    public void updateProductPrice(UUID id, BigDecimal newPrice) {
+        Product product = products.get(id);
+        if (product == null) {
+            throw new NoSuchElementException("Product not found with id: " + id);
+        }
+        product.setPrice(newPrice);
+        changedProducts.add(id);
+    }
 }

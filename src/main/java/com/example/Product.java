@@ -32,7 +32,7 @@ protected Product(String name, Category category, BigDecimal price) {
 }
 
     // Returns the unique identifier of this product
-    public UUID getId() {
+    public UUID uuid() {
         return id;
     }
     // Returns the product name (read-only)
@@ -50,11 +50,11 @@ protected Product(String name, Category category, BigDecimal price) {
     // Updates the product's price, should remain non-null and non-negative
     // Even though the constructor validates the initial price, this method prevents
     // invalid updates after object creation, keeping the Product in a consistent state
-    public void setPrice(BigDecimal price) {
-        if (price == null || price.compareTo(BigDecimal.ZERO) < 0) {
+    public void setPrice(BigDecimal newPrice) {
+        if (newPrice == null || newPrice.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("Price cannot be null or negative");
         }
-    this.price = price;
+    this.price = newPrice;
     }
 
     // Abstract method to be implemented by subclasses, enabling polymorphic behavior.
