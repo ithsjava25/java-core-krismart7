@@ -1,6 +1,7 @@
 package com.example;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 public class ElectronicsProduct extends Product implements Shippable {
     // Warranty period in months; must be non-negative
@@ -10,7 +11,7 @@ public class ElectronicsProduct extends Product implements Shippable {
 
     // Constructs an ElectronicsProduct with the specified parameters
     // Calls the superclass constructor to initialize common Product fields
-    public ElectronicsProduct(String name, Category category, BigDecimal price, int warrantyMonths, BigDecimal weight) {
+    public ElectronicsProduct(UUID id, String name, Category category, BigDecimal price, int warrantyMonths, BigDecimal weight) {
         super(name, category, price);
 
         if (warrantyMonths < 0) {

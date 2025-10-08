@@ -88,4 +88,20 @@ public class Warehouse {
         products.remove(id);
         changedProducts.remove(id);
     }
+
+    public void clearProducts() {
+        products.clear();
+        changedProducts.clear();
+    }
+    public boolean isEmpty() {
+        return products.isEmpty();
+    }
+
+    public Map<Category, List<Product>> getProductsGroupedByCategories() {
+        Map<Category, List<Product>> grouped = new HashMap<>();
+        for (Product p : products.values()) {
+            grouped.computeIfAbsent(p.category(), k -> new ArrayList<>()).add(p);
+        }
+        return grouped;
+    }
 }

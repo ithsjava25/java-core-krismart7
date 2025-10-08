@@ -2,6 +2,7 @@ package com.example;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
 public class FoodProduct extends Product implements Perishable, Shippable {
     // Expiration date of the food product
@@ -12,7 +13,7 @@ public class FoodProduct extends Product implements Perishable, Shippable {
     // Constructor for FoodProduct requires the product's name, category, price, expiration date, and weight.
     // The first three parameters are passed to the superclass to initialize shared Product fields,
     // while expirationDate and weight are specific to FoodProduct.
-    public FoodProduct(String name, Category category, BigDecimal price, LocalDate expirationDate, BigDecimal weight) {
+    public FoodProduct(UUID id, String name, Category category, BigDecimal price, LocalDate expirationDate, BigDecimal weight) {
         // Call the superclass (Product) constructor to initialize the common product fields: name, category, and price
         super(name, category, price);
 
