@@ -17,13 +17,13 @@ public abstract class Product {
     // Automatically assigns a unique ID and ensures required fields are set.
     protected Product(String name, Category category, BigDecimal price) {
         if (name == null || name.isBlank()) {
-            throw new IllegalArgumentException("Product name can't be null or blank");
+            throw new IllegalArgumentException("Product name cannot be null or blank");
         }
         if (category == null) {
-            throw new IllegalArgumentException("Product category can't be null");
+            throw new IllegalArgumentException("Product category cannot be null");
         }
         if (price == null || price.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Price can't be null or negative");
+            throw new IllegalArgumentException("Price cannot be negative.");
         }
 
         this.name = name;

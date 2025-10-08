@@ -18,13 +18,13 @@ public class FoodProduct extends Product implements Perishable, Shippable {
         super(name, category, price);
 
         if (price == null || price.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Price cannot be null or negative");
+            throw new IllegalArgumentException("Price cannot be negative.");
         }
         if (weight == null || weight.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Weight cannot be null or negative");
+            throw new IllegalArgumentException("Weight cannot be negative.");
         }
         if (expirationDate == null) {
-            throw new IllegalArgumentException("Expiration date cannot be null");
+            throw new IllegalArgumentException("Expiration date cannot be null.");
         }
 
         this.expirationDate = expirationDate;
