@@ -1,4 +1,4 @@
 package com.example;
 
-public class ElectronicsProduct extends Product {
+public class ElectronicsProduct extends Product implements Shippable {
 }

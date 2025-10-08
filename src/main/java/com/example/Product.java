@@ -1,4 +1,4 @@
 package com.example;
 
-public class Product {
+public abstract class Product {
 }

@@ -1,5 +1,4 @@
 package com.example;
 
-public class Category {
-
+public final class Category {
 }
