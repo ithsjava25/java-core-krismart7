@@ -31,30 +31,31 @@ public class Warehouse {
     public static Warehouse getInstance(String name) {
         return unique.computeIfAbsent(name, Warehouse::new);
     }
-
+    // Returns the warehouse name
     public String getName() {
         return name;
     }
-
+    // Returns an unmodifiable copy of all products to prevent external modification
     public List<Product> getProducts() {
         return Collections.unmodifiableList(new ArrayList<>(products.values()));
     }
-
+    // Returns a set of IDs for products that had their price updated
     public Set<UUID> getChangedProducts() {
-        return changedProducts;
+        return Collections.unmodifiableSet(changedProducts);
     }
-
+    // Adds a new product to the warehouse
     public void addProduct(Product product) {
         if (product == null) {
             throw new IllegalArgumentException("Product cannot be null.");
         }
         products.put(product.uuid(), product);
     }
-
+    // Retrieves a product by ID, wrapped in Optional to handle missing items safely
     public Optional<Product> getProductById(UUID id) {
         return Optional.ofNullable(products.get(id));
     }
-
+    // Updates the price of a product; if not found, throws an exception
+    // Also tracks the updated product’s ID in the changedProducts set
     public void updateProductPrice(UUID id, BigDecimal newPrice) {
         Product product = products.get(id);
         if (product == null) {
@@ -63,7 +64,7 @@ public class Warehouse {
         product.setPrice(newPrice);
         changedProducts.add(id);
     }
-
+    // Returns all perishable products that are expired
     public List<Perishable> expiredProducts() {
         List<Perishable> expiredItems = new ArrayList<>();
         for (Product p : products.values()) {
@@ -73,7 +74,7 @@ public class Warehouse {
         }
         return expiredItems;
     }
-
+    // Returns all products that can be shipped
     public List<Shippable> shippableProducts() {
         List<Shippable> items = new ArrayList<>();
         for (Product p : products.values()) {
@@ -83,20 +84,21 @@ public class Warehouse {
         }
         return items;
     }
-
+    // Removes a product from the warehouse and clears its "changed" status
     public void remove(UUID id) {
         products.remove(id);
         changedProducts.remove(id);
     }
-
+    // Removes all products and clears the change tracker
     public void clearProducts() {
         products.clear();
         changedProducts.clear();
     }
+    // Returns true if the warehouse has no products
     public boolean isEmpty() {
         return products.isEmpty();
     }
-
+    // Groups all products by category and returns a map of category → product list
     public Map<Category, List<Product>> getProductsGroupedByCategories() {
         Map<Category, List<Product>> grouped = new HashMap<>();
         for (Product p : products.values()) {
