@@ -1,4 +1,39 @@
 package com.example;
 
+import java.math.BigDecimal;
+
 public class ElectronicsProduct extends Product implements Shippable {
+    // Warranty period in months; must be non-negative
+    private final int warrantyMonths;
+    // Weight of the product in kilograms; must be non-negative
+    private final BigDecimal weight;
+
+    // Constructs an ElectronicsProduct with the specified parameters
+    // Calls the superclass constructor to initialize common Product fields
+    public ElectronicsProduct(String name, Category category, BigDecimal price, int warrantyMonths, BigDecimal weight) {
+        super(name, category, price);
+
+        if (warrantyMonths < 0) {
+            throw new IllegalArgumentException("Warranty months can't be negative");
+        }
+        if (weight == null || weight.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Weight can't be null or negative");
+        }
+
+        this.warrantyMonths = warrantyMonths;
+        this.weight = weight;
+    }
+    // Returns the warranty period in months
+    public int getWarrantyMonths() {
+        return warrantyMonths;
+    }
+    // Returns the weight of the product
+    public BigDecimal getWeight() {
+        return weight;
+    }
+    // Provides product-specific details, demonstrating polymorphism
+    @Override
+    public String productDetails() {
+        return "Electronics: " + getName() + ", Warranty: " + warrantyMonths + " months";
+    }
 }
