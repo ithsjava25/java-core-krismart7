@@ -2,6 +2,7 @@ package com.example;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 // Warehouse class that stores products and enforces singleton-per-name
 // Each warehouse is uniquely identified by its nam
@@ -12,6 +13,9 @@ public class Warehouse {
     // they all get the same object (singleton per name)
     private static final Map<String, Warehouse> unique = new HashMap<>();
     private final String name;
+
+    // Map storing all products by their UUID for fast lookup
+    private final Map<UUID, Product> products = new HashMap<>();
 
     // Private constructor ensures controlled instantiation
     private Warehouse(String name) {
