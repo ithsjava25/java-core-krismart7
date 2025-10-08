@@ -31,17 +31,17 @@ public class FoodProduct extends Product implements Perishable, Shippable {
     }
 
     @Override
-    public LocalDate getExpirationDate() {
+    public LocalDate expirationDate() {
         return expirationDate;
     }
     // Returns the weight of the food product
-    public double getWeight() {
+    public double weight() {
         return weight.doubleValue();
     }
     // Returns a string describing the food product; used for polymorphic behavior
     @Override
     public String productDetails() {
-        return "Food: " + getName() + ", Expires: " + getExpirationDate();
+        return "Food: " + name() + ", Expires: " + expirationDate();
     }
     // Calculates shipping cost for the food product based on weight
     @Override

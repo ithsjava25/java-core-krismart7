@@ -36,8 +36,8 @@ public class Warehouse {
         return name;
     }
 
-    public Map<UUID, Product> getProducts() {
-        return Collections.unmodifiableMap(products);
+    public List<Product> getProducts() {
+        return Collections.unmodifiableList(new ArrayList<>(products.values()));
     }
 
     public Set<UUID> getChangedProducts() {
@@ -62,5 +62,30 @@ public class Warehouse {
         }
         product.setPrice(newPrice);
         changedProducts.add(id);
+    }
+
+    public List<Perishable> expiredProducts() {
+        List<Perishable> expiredItems = new ArrayList<>();
+        for (Product p : products.values()) {
+            if (p instanceof Perishable perishable && perishable.isExpired()) {
+                expiredItems.add(perishable);
+            }
+        }
+        return expiredItems;
+    }
+
+    public List<Shippable> shippableProducts() {
+        List<Shippable> items = new ArrayList<>();
+        for (Product p : products.values()) {
+            if (p instanceof Shippable) {
+                items.add((Shippable)p);
+            }
+        }
+        return items;
+    }
+
+    public void remove(UUID id) {
+        products.remove(id);
+        changedProducts.remove(id);
     }
 }

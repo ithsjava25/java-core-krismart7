@@ -28,13 +28,13 @@ public class ElectronicsProduct extends Product implements Shippable {
         return warrantyMonths;
     }
     // Returns the weight of the product
-    public double getWeight() {
+    public double weight() {
         return weight.doubleValue();
     }
     // Provides product-specific details, demonstrating polymorphism
     @Override
     public String productDetails() {
-        return "Electronics: " + getName() + ", Warranty: " + warrantyMonths + " months";
+        return "Electronics: " + name() + ", Warranty: " + warrantyMonths + " months";
     }
     // Calculates shipping cost for the electronics product
     @Override

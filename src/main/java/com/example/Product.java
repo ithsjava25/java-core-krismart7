@@ -15,38 +15,42 @@ public abstract class Product {
 
     // Protected constructor used by subclasses to initialize a Product with name, category, and price.
     // Automatically assigns a unique ID and ensures required fields are set.
-protected Product(String name, Category category, BigDecimal price) {
-    if (name == null || name.isBlank()) {
-        throw new IllegalArgumentException("Product name can't be null or blank");
-    }
-    if (category == null) {
-        throw new IllegalArgumentException("Product category can't be null");
-    }
-    if (price == null || price.compareTo(BigDecimal.ZERO) < 0) {
-        throw new IllegalArgumentException("Price can't be null or negative");
-    }
+    protected Product(String name, Category category, BigDecimal price) {
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("Product name can't be null or blank");
+        }
+        if (category == null) {
+            throw new IllegalArgumentException("Product category can't be null");
+        }
+        if (price == null || price.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Price can't be null or negative");
+        }
 
-    this.name = name;
-    this.category = category;
-    this.price = price;
-}
+        this.name = name;
+        this.category = category;
+        this.price = price;
+    }
 
     // Returns the unique identifier of this product
     public UUID uuid() {
         return id;
     }
+
     // Returns the product name (read-only)
-    public String getName() {
+    public String name() {
         return name;
     }
+
     // Returns the product category (read-only)
-    public Category getCategory() {
+    public Category category() {
         return category;
     }
+
     // Returns the current price of the product
-    public BigDecimal getPrice() {
+    public BigDecimal price() {
         return price;
     }
+
     // Updates the product's price, should remain non-null and non-negative
     // Even though the constructor validates the initial price, this method prevents
     // invalid updates after object creation, keeping the Product in a consistent state
@@ -54,7 +58,7 @@ protected Product(String name, Category category, BigDecimal price) {
         if (newPrice == null || newPrice.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("Price cannot be null or negative");
         }
-    this.price = newPrice;
+        this.price = newPrice;
     }
 
     // Abstract method to be implemented by subclasses, enabling polymorphic behavior.
