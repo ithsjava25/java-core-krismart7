@@ -15,7 +15,7 @@ public class FoodProduct extends Product implements Perishable, Shippable {
     // while expirationDate and weight are specific to FoodProduct.
     public FoodProduct(UUID id, String name, Category category, BigDecimal price, LocalDate expirationDate, BigDecimal weight) {
         // Call the superclass (Product) constructor to initialize the common product fields: name, category, and price
-        super(name, category, price);
+        super(id, name, category, price);
 
         if (price == null || price.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("Price cannot be negative.");
@@ -35,6 +35,7 @@ public class FoodProduct extends Product implements Perishable, Shippable {
     public LocalDate expirationDate() {
         return expirationDate;
     }
+    @Override
     // Returns the weight of the food product
     public double weight() {
         return weight.doubleValue();

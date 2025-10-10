@@ -5,7 +5,7 @@ import java.util.UUID;
 
 public abstract class Product {
     // Unique identifier for the product, assigned automatically
-    private final UUID id = UUID.randomUUID();
+    private final UUID id;
     // Name of the product, immutable
     private final String name;
     // Category of the product, immutable
@@ -15,7 +15,7 @@ public abstract class Product {
 
     // Protected constructor used by subclasses to initialize a Product with name, category, and price.
     // Automatically assigns a unique ID and ensures required fields are set.
-    protected Product(String name, Category category, BigDecimal price) {
+    protected Product(UUID id, String name, Category category, BigDecimal price) {
         if (name == null || name.isBlank()) {
             throw new IllegalArgumentException("Product name cannot be null or blank");
         }
@@ -25,7 +25,7 @@ public abstract class Product {
         if (price == null || price.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("Price cannot be negative.");
         }
-
+        this.id = id;
         this.name = name;
         this.category = category;
         this.price = price;

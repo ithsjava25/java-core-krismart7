@@ -12,7 +12,7 @@ public class ElectronicsProduct extends Product implements Shippable {
     // Constructs an ElectronicsProduct with the specified parameters
     // Calls the superclass constructor to initialize common Product fields
     public ElectronicsProduct(UUID id, String name, Category category, BigDecimal price, int warrantyMonths, BigDecimal weight) {
-        super(name, category, price);
+        super(id, name, category, price);
 
         if (warrantyMonths < 0) {
             throw new IllegalArgumentException("Warranty months cannot be negative.");
@@ -28,6 +28,7 @@ public class ElectronicsProduct extends Product implements Shippable {
     public int getWarrantyMonths() {
         return warrantyMonths;
     }
+    @Override
     // Returns the weight of the product
     public double weight() {
         return weight.doubleValue();

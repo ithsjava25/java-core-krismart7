@@ -1,13 +1,13 @@
 package com.example;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
 
 public final class Category {
 
     // Cache storing unique Category instances by normalized name (Flyweight pattern)
-    private static final Map<String, Category> CACHE = new ConcurrentHashMap<>();
+    private static final Map<String, Category> CACHE = new HashMap<>();
     // The normalized name of this category (first letter capitalized)
     private final String name;
 
@@ -29,24 +29,24 @@ public final class Category {
             throw new IllegalArgumentException("Category name can't be blank");
         }
 
-        // Normalize the category name: first letter uppercase, rest lowercase
-        String normalizedName = trimmedName.substring(0, 1).toUpperCase() + trimmedName.substring(1).toLowerCase();
+        // Capitalize the category name: first letter uppercase, rest lowercase
+        String capitalizedName = trimmedName.substring(0, 1).toUpperCase() + trimmedName.substring(1).toLowerCase();
 
         // If not cached yet, create new instance and store it
-        if (!CACHE.containsKey(normalizedName)) {
-            CACHE.put(normalizedName, new Category(normalizedName));
+        if (!CACHE.containsKey(capitalizedName)) {
+            CACHE.put(capitalizedName, new Category(capitalizedName));
         }
-        // Return cached instance for the normalized name
-        return CACHE.get(normalizedName);
+        // Return the cached Category instance for this capitalized name
+        return CACHE.get(capitalizedName);
     }
 
-    // Returns the normalized category name, providing read-only access to the category value
+    // Returns the capitalized category name, providing read-only access to the category value
     public String getName() {
         return name;
     }
 
-    // Checks if this Category is equal to another object based on the normalized name
-    // Ensures categories with the same name are considered identical
+    // Checks if this Category is equal to another object based on the capitalized name
+    // Ensures categories with the same capitalized name are considered identical
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
