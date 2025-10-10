@@ -30,7 +30,8 @@ public final class Category {
         }
 
         // Capitalize the category name: first letter uppercase, rest lowercase
-        String capitalizedName = trimmedName.substring(0, 1).toUpperCase() + trimmedName.substring(1).toLowerCase();
+        String capitalizedName = trimmedName.substring(0, 1).toUpperCase()
+                                    + trimmedName.substring(1).toLowerCase();
 
         // If not cached yet, create new instance and store it
         if (!CACHE.containsKey(capitalizedName)) {

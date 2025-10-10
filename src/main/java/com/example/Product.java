@@ -1,68 +1,38 @@
 package com.example;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.UUID;
 
 public abstract class Product {
-    // Unique identifier for the product, assigned automatically
     private final UUID id;
-    // Name of the product, immutable
     private final String name;
-    // Category of the product, immutable
     private final Category category;
-    // Price of the product, mutable to allow updates via setPrice()
     private BigDecimal price;
 
-    // Protected constructor used by subclasses to initialize a Product with name, category, and price.
-    // Automatically assigns a unique ID and ensures required fields are set.
     protected Product(UUID id, String name, Category category, BigDecimal price) {
-        if (name == null || name.isBlank()) {
-            throw new IllegalArgumentException("Product name cannot be null or blank");
-        }
-        if (category == null) {
-            throw new IllegalArgumentException("Product category cannot be null");
-        }
-        if (price == null || price.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Price cannot be negative.");
-        }
+        if (id == null) { throw new IllegalArgumentException("ID cannot be null"); }
+        if (name == null || name.isBlank()) { throw new IllegalArgumentException("Product name cannot be null or blank");}
+        if (category == null) { throw new IllegalArgumentException("Product category cannot be null"); }
+        if (price == null || price.compareTo(BigDecimal.ZERO) < 0) { throw new IllegalArgumentException("Price cannot be negative."); }
+
         this.id = id;
         this.name = name;
         this.category = category;
-        this.price = price;
+        this.price = price.setScale(2, RoundingMode.HALF_UP);
     }
 
-    // Returns the unique identifier of this product
-    public UUID uuid() {
-        return id;
-    }
+    public UUID uuid() { return id; }
+    public String name() { return name; }
+    public Category category() { return category; }
+    public BigDecimal price() { return price; }
 
-    // Returns the product name (read-only)
-    public String name() {
-        return name;
-    }
-
-    // Returns the product category (read-only)
-    public Category category() {
-        return category;
-    }
-
-    // Returns the current price of the product
-    public BigDecimal price() {
-        return price;
-    }
-
-    // Updates the product's price, should remain non-null and non-negative
-    // Even though the constructor validates the initial price, this method prevents
-    // invalid updates after object creation, keeping the Product in a consistent state
     public void setPrice(BigDecimal newPrice) {
         if (newPrice == null || newPrice.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("Price cannot be null or negative");
         }
-        this.price = newPrice;
+        this.price = newPrice.setScale(2, RoundingMode.HALF_UP);
     }
 
-    // Abstract method to be implemented by subclasses, enabling polymorphic behavior.
-    // Each subclass provides its own product-specific details, allowing code
-    // to work with Product references while invoking the correct implementation at runtime.
     public abstract String productDetails();
 }

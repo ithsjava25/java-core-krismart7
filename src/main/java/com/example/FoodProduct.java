@@ -1,53 +1,36 @@
 package com.example;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.UUID;
 
 public class FoodProduct extends Product implements Perishable, Shippable {
-    // Expiration date of the food product
     private final LocalDate expirationDate;
-    // Weight of the food product in kilograms
     private final BigDecimal weight;
 
-    // Constructor for FoodProduct requires the product's name, category, price, expiration date, and weight.
-    // The first three parameters are passed to the superclass to initialize shared Product fields,
-    // while expirationDate and weight are specific to FoodProduct.
     public FoodProduct(UUID id, String name, Category category, BigDecimal price, LocalDate expirationDate, BigDecimal weight) {
-        // Call the superclass (Product) constructor to initialize the common product fields: name, category, and price
         super(id, name, category, price);
 
-        if (price == null || price.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Price cannot be negative.");
-        }
-        if (weight == null || weight.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Weight cannot be negative.");
-        }
-        if (expirationDate == null) {
-            throw new IllegalArgumentException("Expiration date cannot be null.");
-        }
+        if (price == null || price.compareTo(BigDecimal.ZERO) < 0) { throw new IllegalArgumentException("Price cannot be negative."); }
+        if (weight == null || weight.compareTo(BigDecimal.ZERO) < 0) { throw new IllegalArgumentException("Weight cannot be negative."); }
+        if (expirationDate == null) { throw new IllegalArgumentException("Expiration date cannot be null."); }
 
         this.expirationDate = expirationDate;
         this.weight = weight;
     }
 
     @Override
-    public LocalDate expirationDate() {
-        return expirationDate;
-    }
+    public LocalDate expirationDate() { return expirationDate; }
     @Override
-    // Returns the weight of the food product
-    public double weight() {
-        return weight.doubleValue();
-    }
-    // Returns a string describing the food product; used for polymorphic behavior
+
+    public double weight() { return weight.doubleValue(); }
+
     @Override
-    public String productDetails() {
-        return "Food: " + name() + ", Expires: " + expirationDate();
-    }
-    // Calculates shipping cost for the food product based on weight
+    public String productDetails() { return "Food: " + name() + ", Expires: " + expirationDate(); }
+
     @Override
     public BigDecimal calculateShippingCost() {
-        return weight.multiply(BigDecimal.valueOf(50));
+        return weight.multiply(BigDecimal.valueOf(50)).setScale(2, RoundingMode.HALF_UP);
     }
 }
