@@ -48,7 +48,14 @@ public abstract class Product {
     }
 
     @Override
-    public String toString() { return "Product{" + "name='" + name + '\'' + '}'; }
+    public String toString() {
+        return "Product{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", category=" + category +
+                ", price=" + price +
+                '}';
+    }
 
     public abstract String productDetails();
 }

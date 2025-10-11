@@ -99,6 +99,18 @@ public class Warehouse {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Warehouse warehouse = (Warehouse) o;
+        return Objects.equals(name, warehouse.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(name);
+    }
+
+    @Override
     public String toString() {
         return "Warehouse{" + "name='" + name + '\'' + ", productsById=" + productsById + ", changedProducts=" + changedProducts + '}';
     }

@@ -22,9 +22,7 @@ public class ElectronicsProduct extends Product implements Shippable {
     public double weight() { return weight.doubleValue(); }
 
     @Override
-    public String productDetails() {
-        return "Electronics: " + name() + ", Warranty: " + warrantyMonths + " months";
-    }
+    public String productDetails() { return "Electronics: " + name() + ", Warranty: " + warrantyMonths + " months"; }
 
     @Override
     public BigDecimal calculateShippingCost() {
