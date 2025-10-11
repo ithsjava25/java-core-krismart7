@@ -36,7 +36,7 @@ public class Warehouse {
         return name;
     }
     // Returns an unmodifiable copy of all products to prevent external modification
-    public List<Product> getProductsById() {
+    public List<Product> getProducts() {
         return Collections.unmodifiableList(new ArrayList<>(productsById.values()));
     }
     // Returns a set of IDs for products that had their price updated
@@ -48,10 +48,12 @@ public class Warehouse {
         if (product == null) {
             throw new IllegalArgumentException("Product cannot be null.");
         }
+        System.out.println("Adding product: " + product.name() + " with price " + product.price());
         productsById.put(product.uuid(), product);
+        System.out.println("Warehouse size now: " + productsById.size());
     }
     // Retrieves a product by ID, wrapped in Optional to handle missing items safely
-    public Optional<Product> getProductById(UUID id) {
+    public Optional<Product> getProductsById(UUID id) {
         return Optional.ofNullable(productsById.get(id));
     }
     // Updates the price of a product; if not found, throws an exception

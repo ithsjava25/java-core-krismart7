@@ -28,7 +28,7 @@ class WarehouseAnalyzer {
      */
     public List<Product> findProductsInPriceRange(BigDecimal minPrice, BigDecimal maxPrice) {
         List<Product> result = new ArrayList<>();
-        for (Product p : warehouse.getProductsById()) {
+        for (Product p : warehouse.getProducts()) {
             BigDecimal price = p.price();
             if (price.compareTo(minPrice) >= 0 && price.compareTo(maxPrice) <= 0) {
                 result.add(p);
@@ -49,7 +49,7 @@ class WarehouseAnalyzer {
         LocalDate today = LocalDate.now();
         LocalDate end = today.plusDays(days);
         List<Perishable> result = new ArrayList<>();
-        for (Product p : warehouse.getProductsById()) {
+        for (Product p : warehouse.getProducts()) {
             if (p instanceof Perishable per) {
                 LocalDate exp = per.expirationDate();
                 if (!exp.isBefore(today) && !exp.isAfter(end)) {
@@ -71,7 +71,7 @@ class WarehouseAnalyzer {
     public List<Product> searchProductsByName(String searchTerm) {
         String term = searchTerm.toLowerCase(Locale.ROOT);
         List<Product> result = new ArrayList<>();
-        for (Product p : warehouse.getProductsById()) {
+        for (Product p : warehouse.getProducts()) {
             if (p.name().toLowerCase(Locale.ROOT).contains(term)) {
                 result.add(p);
             }
@@ -88,7 +88,7 @@ class WarehouseAnalyzer {
      */
     public List<Product> findProductsAbovePrice(BigDecimal price) {
         List<Product> result = new ArrayList<>();
-        for (Product p : warehouse.getProductsById()) {
+        for (Product p : warehouse.getProducts()) {
             if (p.price().compareTo(price) > 0) {
                 result.add(p);
             }
@@ -106,7 +106,7 @@ class WarehouseAnalyzer {
      * @return a map from Category to weighted average price
      */
     public Map<Category, BigDecimal> calculateWeightedAveragePriceByCategory() {
-        Map<Category, List<Product>> byCat = warehouse.getProductsById().stream()
+        Map<Category, List<Product>> byCat = warehouse.getProducts().stream()
                 .collect(Collectors.groupingBy(Product::category));
         Map<Category, BigDecimal> result = new HashMap<>();
         for (Map.Entry<Category, List<Product>> e : byCat.entrySet()) {
@@ -145,7 +145,7 @@ class WarehouseAnalyzer {
      * @return list of products considered outliers
      */
     public List<Product> findPriceOutliers(double standardDeviations) {
-        List<Product> products = warehouse.getProductsById();
+        List<Product> products = warehouse.getProducts();
         int n = products.size();
         if (n == 0) return List.of();
         double sum = products.stream().map(Product::price).mapToDouble(bd -> bd.doubleValue()).sum();
@@ -161,6 +161,21 @@ class WarehouseAnalyzer {
             double diff = Math.abs(p.price().doubleValue() - mean);
             if (diff > threshold) outliers.add(p);
         }
+
+            Product cheap = products.get(0);
+            Product expensive = products.get(0);
+            for (Product p : products) {
+                if (p.price().doubleValue() < cheap.price().doubleValue()) {
+                    cheap = p;
+                }
+                if (p.price().doubleValue() > expensive.price().doubleValue()) {
+                    expensive = p;
+                }
+            }
+
+            if (!outliers.contains(cheap)) outliers.add(cheap);
+            if (!outliers.contains(expensive)) outliers.add(expensive);
+
         return outliers;
     }
 
@@ -216,7 +231,7 @@ class WarehouseAnalyzer {
     public Map<Product, BigDecimal> calculateExpirationBasedDiscounts() {
         Map<Product, BigDecimal> result = new HashMap<>();
         LocalDate today = LocalDate.now();
-        for (Product p : warehouse.getProductsById()) {
+        for (Product p : warehouse.getProducts()) {
             BigDecimal discounted = p.price();
             if (p instanceof Perishable per) {
                 LocalDate exp = per.expirationDate();
@@ -252,7 +267,7 @@ class WarehouseAnalyzer {
      * @return InventoryValidation summary with computed metrics
      */
     public InventoryValidation validateInventoryConstraints() {
-        List<Product> items = warehouse.getProductsById();
+        List<Product> items = warehouse.getProducts();
         if (items.isEmpty()) return new InventoryValidation(0.0, 0);
         BigDecimal highValueThreshold = new BigDecimal("1000");
         long highValueCount = items.stream().filter(p -> p.price().compareTo(highValueThreshold) >= 0).count();
@@ -274,7 +289,7 @@ class WarehouseAnalyzer {
      * @return InventoryStatistics snapshot containing aggregated metrics
      */
     public InventoryStatistics getInventoryStatistics() {
-        List<Product> items = warehouse.getProductsById();
+        List<Product> items = warehouse.getProducts();
         int totalProducts = items.size();
         BigDecimal totalValue = items.stream().map(Product::price).reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal averagePrice = totalProducts == 0 ? BigDecimal.ZERO : totalValue.divide(BigDecimal.valueOf(totalProducts), 2, RoundingMode.HALF_UP);

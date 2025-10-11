@@ -142,7 +142,7 @@ class BasicTest {
                 // Arrange
                 Product milk = new FoodProduct(UUID.randomUUID(), "Milk", Category.of("Dairy"), BigDecimal.TEN, LocalDate.now(), BigDecimal.ONE);
                 warehouse.addProduct(milk);
-                assertThat(warehouse.getProductsById()).hasSize(1);
+                assertThat(warehouse.getProducts()).hasSize(1);
 
                 // Act
                 warehouse.remove(milk.uuid());
@@ -151,7 +151,7 @@ class BasicTest {
                 assertThat(warehouse.isEmpty())
                         .as("Warehouse should be empty after the only product is removed.")
                         .isTrue();
-                assertThat(warehouse.getProductById(milk.uuid()))
+                assertThat(warehouse.getProductsById(milk.uuid()))
                         .as("The removed product should no longer be found.")
                         .isEmpty();
             }
@@ -185,7 +185,7 @@ class BasicTest {
                 UUID nonExistentId = UUID.randomUUID();
 
                 // Act & Assert
-                assertThat(warehouse.getProductById(nonExistentId))
+                assertThat(warehouse.getProductsById(nonExistentId))
                         .as("Searching for a non-existent product should result in an empty Optional.")
                         .isEmpty();
             }
