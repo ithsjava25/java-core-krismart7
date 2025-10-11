@@ -18,8 +18,6 @@ public class ElectronicsProduct extends Product implements Shippable {
         this.weight = weight;
     }
 
-    public int getWarrantyMonths() { return warrantyMonths; }
-
     @Override
     public double weight() { return weight.doubleValue(); }
 
@@ -35,5 +33,10 @@ public class ElectronicsProduct extends Product implements Shippable {
             cost = cost.add(BigDecimal.valueOf(49));
         }
         return cost.setScale(2, RoundingMode.HALF_UP);
+    }
+
+    @Override
+    public String toString() {
+        return "ElectronicsProduct{" + "warrantyMonths=" + warrantyMonths + ", weight=" + weight + '}';
     }
 }

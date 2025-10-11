@@ -47,5 +47,8 @@ public abstract class Product {
         return Objects.hashCode(id);
     }
 
+    @Override
+    public String toString() { return "Product{" + "name='" + name + '\'' + '}'; }
+
     public abstract String productDetails();
 }

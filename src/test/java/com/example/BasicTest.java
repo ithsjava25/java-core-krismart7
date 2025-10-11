@@ -151,7 +151,7 @@ class BasicTest {
                 assertThat(warehouse.isEmpty())
                         .as("Warehouse should be empty after the only product is removed.")
                         .isTrue();
-                assertThat(warehouse.getProductsById(milk.uuid()))
+                assertThat(warehouse.getProductById(milk.uuid()))
                         .as("The removed product should no longer be found.")
                         .isEmpty();
             }
@@ -185,7 +185,7 @@ class BasicTest {
                 UUID nonExistentId = UUID.randomUUID();
 
                 // Act & Assert
-                assertThat(warehouse.getProductsById(nonExistentId))
+                assertThat(warehouse.getProductById(nonExistentId))
                         .as("Searching for a non-existent product should result in an empty Optional.")
                         .isEmpty();
             }
