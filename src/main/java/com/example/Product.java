@@ -2,6 +2,7 @@ package com.example;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Objects;
 import java.util.UUID;
 
 public abstract class Product {
@@ -32,6 +33,18 @@ public abstract class Product {
             throw new IllegalArgumentException("Price cannot be null or negative");
         }
         this.price = newPrice.setScale(2, RoundingMode.HALF_UP);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Product product = (Product) o;
+        return Objects.equals(id, product.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
     }
 
     public abstract String productDetails();

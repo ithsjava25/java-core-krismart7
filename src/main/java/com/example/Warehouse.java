@@ -14,10 +14,10 @@ public class Warehouse {
     private final String name;
 
     // Map storing all products by their UUID for fast lookup
-    private final Map<UUID, Product> products = new HashMap<>();
+    private final Map<UUID, Product> productsById = new HashMap<>();
 
     // Set of UUIDs for products that have changed (price updates)
-    private final Set<UUID> changedProducts = new HashSet<>();
+    private final Set<UUID> updatedProductIds = new HashSet<>();
 
     // Private constructor ensures controlled instantiation
     private Warehouse(String name) {
@@ -36,72 +36,72 @@ public class Warehouse {
         return name;
     }
     // Returns an unmodifiable copy of all products to prevent external modification
-    public List<Product> getProducts() {
-        return Collections.unmodifiableList(new ArrayList<>(products.values()));
+    public List<Product> getProductsById() {
+        return Collections.unmodifiableList(new ArrayList<>(productsById.values()));
     }
     // Returns a set of IDs for products that had their price updated
-    public Set<UUID> getChangedProducts() {
-        return Collections.unmodifiableSet(changedProducts);
+    public Set<UUID> getUpdatedProductIds() {
+        return Collections.unmodifiableSet(updatedProductIds);
     }
     // Adds a new product to the warehouse
     public void addProduct(Product product) {
         if (product == null) {
             throw new IllegalArgumentException("Product cannot be null.");
         }
-        products.put(product.uuid(), product);
+        productsById.put(product.uuid(), product);
     }
     // Retrieves a product by ID, wrapped in Optional to handle missing items safely
     public Optional<Product> getProductById(UUID id) {
-        return Optional.ofNullable(products.get(id));
+        return Optional.ofNullable(productsById.get(id));
     }
     // Updates the price of a product; if not found, throws an exception
     // Also tracks the updated product’s ID in the changedProducts set
     public void updateProductPrice(UUID id, BigDecimal newPrice) {
-        Product product = products.get(id);
+        Product product = productsById.get(id);
         if (product == null) {
             throw new NoSuchElementException("Product not found with id: " + id);
         }
         product.setPrice(newPrice);
-        changedProducts.add(id);
+        updatedProductIds.add(id);
     }
     // Returns all perishable products that are expired
     public List<Perishable> expiredProducts() {
-        List<Perishable> expiredItems = new ArrayList<>();
-        for (Product p : products.values()) {
+        List<Perishable> expiredProducts = new ArrayList<>();
+        for (Product p : productsById.values()) {
             if (p instanceof Perishable perishable && perishable.isExpired()) {
-                expiredItems.add(perishable);
+                expiredProducts.add(perishable);
             }
         }
-        return expiredItems;
+        return expiredProducts;
     }
     // Returns all products that can be shipped
     public List<Shippable> shippableProducts() {
-        List<Shippable> items = new ArrayList<>();
-        for (Product p : products.values()) {
-            if (p instanceof Shippable) {
-                items.add((Shippable)p);
+        List<Shippable> shippableProducts = new ArrayList<>();
+        for (Product p : productsById.values()) {
+            if (p instanceof Shippable shippable) {
+                shippableProducts.add(shippable);
             }
         }
-        return items;
+        return shippableProducts;
     }
     // Removes a product from the warehouse and clears its "changed" status
     public void remove(UUID id) {
-        products.remove(id);
-        changedProducts.remove(id);
+        productsById.remove(id);
+        updatedProductIds.remove(id);
     }
     // Removes all products and clears the change tracker
     public void clearProducts() {
-        products.clear();
-        changedProducts.clear();
+        productsById.clear();
+        updatedProductIds.clear();
     }
     // Returns true if the warehouse has no products
     public boolean isEmpty() {
-        return products.isEmpty();
+        return productsById.isEmpty();
     }
     // Groups all products by category and returns a map of category → product list
     public Map<Category, List<Product>> getProductsGroupedByCategories() {
         Map<Category, List<Product>> grouped = new HashMap<>();
-        for (Product p : products.values()) {
+        for (Product p : productsById.values()) {
             grouped.computeIfAbsent(p.category(), k -> new ArrayList<>()).add(p);
         }
         return grouped;

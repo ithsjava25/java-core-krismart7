@@ -142,7 +142,7 @@ class BasicTest {
                 // Arrange
                 Product milk = new FoodProduct(UUID.randomUUID(), "Milk", Category.of("Dairy"), BigDecimal.TEN, LocalDate.now(), BigDecimal.ONE);
                 warehouse.addProduct(milk);
-                assertThat(warehouse.getProducts()).hasSize(1);
+                assertThat(warehouse.getProductsById()).hasSize(1);
 
                 // Act
                 warehouse.remove(milk.uuid());

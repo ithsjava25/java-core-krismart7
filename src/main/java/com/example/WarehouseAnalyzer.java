@@ -1,7 +1,6 @@
 package com.example;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.*;
@@ -29,7 +28,7 @@ class WarehouseAnalyzer {
      */
     public List<Product> findProductsInPriceRange(BigDecimal minPrice, BigDecimal maxPrice) {
         List<Product> result = new ArrayList<>();
-        for (Product p : warehouse.getProducts()) {
+        for (Product p : warehouse.getProductsById()) {
             BigDecimal price = p.price();
             if (price.compareTo(minPrice) >= 0 && price.compareTo(maxPrice) <= 0) {
                 result.add(p);
@@ -50,7 +49,7 @@ class WarehouseAnalyzer {
         LocalDate today = LocalDate.now();
         LocalDate end = today.plusDays(days);
         List<Perishable> result = new ArrayList<>();
-        for (Product p : warehouse.getProducts()) {
+        for (Product p : warehouse.getProductsById()) {
             if (p instanceof Perishable per) {
                 LocalDate exp = per.expirationDate();
                 if (!exp.isBefore(today) && !exp.isAfter(end)) {
@@ -72,7 +71,7 @@ class WarehouseAnalyzer {
     public List<Product> searchProductsByName(String searchTerm) {
         String term = searchTerm.toLowerCase(Locale.ROOT);
         List<Product> result = new ArrayList<>();
-        for (Product p : warehouse.getProducts()) {
+        for (Product p : warehouse.getProductsById()) {
             if (p.name().toLowerCase(Locale.ROOT).contains(term)) {
                 result.add(p);
             }
@@ -89,7 +88,7 @@ class WarehouseAnalyzer {
      */
     public List<Product> findProductsAbovePrice(BigDecimal price) {
         List<Product> result = new ArrayList<>();
-        for (Product p : warehouse.getProducts()) {
+        for (Product p : warehouse.getProductsById()) {
             if (p.price().compareTo(price) > 0) {
                 result.add(p);
             }
@@ -107,7 +106,7 @@ class WarehouseAnalyzer {
      * @return a map from Category to weighted average price
      */
     public Map<Category, BigDecimal> calculateWeightedAveragePriceByCategory() {
-        Map<Category, List<Product>> byCat = warehouse.getProducts().stream()
+        Map<Category, List<Product>> byCat = warehouse.getProductsById().stream()
                 .collect(Collectors.groupingBy(Product::category));
         Map<Category, BigDecimal> result = new HashMap<>();
         for (Map.Entry<Category, List<Product>> e : byCat.entrySet()) {
@@ -146,7 +145,7 @@ class WarehouseAnalyzer {
      * @return list of products considered outliers
      */
     public List<Product> findPriceOutliers(double standardDeviations) {
-        List<Product> products = warehouse.getProducts();
+        List<Product> products = warehouse.getProductsById();
         int n = products.size();
         if (n == 0) return List.of();
         double sum = products.stream().map(Product::price).mapToDouble(bd -> bd.doubleValue()).sum();
@@ -217,7 +216,7 @@ class WarehouseAnalyzer {
     public Map<Product, BigDecimal> calculateExpirationBasedDiscounts() {
         Map<Product, BigDecimal> result = new HashMap<>();
         LocalDate today = LocalDate.now();
-        for (Product p : warehouse.getProducts()) {
+        for (Product p : warehouse.getProductsById()) {
             BigDecimal discounted = p.price();
             if (p instanceof Perishable per) {
                 LocalDate exp = per.expirationDate();
@@ -253,7 +252,7 @@ class WarehouseAnalyzer {
      * @return InventoryValidation summary with computed metrics
      */
     public InventoryValidation validateInventoryConstraints() {
-        List<Product> items = warehouse.getProducts();
+        List<Product> items = warehouse.getProductsById();
         if (items.isEmpty()) return new InventoryValidation(0.0, 0);
         BigDecimal highValueThreshold = new BigDecimal("1000");
         long highValueCount = items.stream().filter(p -> p.price().compareTo(highValueThreshold) >= 0).count();
@@ -275,7 +274,7 @@ class WarehouseAnalyzer {
      * @return InventoryStatistics snapshot containing aggregated metrics
      */
     public InventoryStatistics getInventoryStatistics() {
-        List<Product> items = warehouse.getProducts();
+        List<Product> items = warehouse.getProductsById();
         int totalProducts = items.size();
         BigDecimal totalValue = items.stream().map(Product::price).reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal averagePrice = totalProducts == 0 ? BigDecimal.ZERO : totalValue.divide(BigDecimal.valueOf(totalProducts), 2, RoundingMode.HALF_UP);
