@@ -9,7 +9,6 @@ public final class Category {
     // Flyweight-cache: normaliserat namn → unik Category-instans
     private static final Map<String, Category> CACHE = new HashMap<>();
     private final String name;
-
     // Endast instanser via of() (flyweight/factory-mönster)
     private Category(String name) {
         this.name = name;
