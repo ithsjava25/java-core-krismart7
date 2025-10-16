@@ -7,7 +7,7 @@ import java.util.Objects;
 public final class Category {
 
     // Flyweight-cache: normaliserat namn → unik Category-instans
-    private static final Map<String, Category> CACHE = new HashMap<>();
+    private static final Map<String, Category> category = new HashMap<>();
     private final String name;
     // Endast instanser via of() (flyweight/factory-mönster)
     private Category(String name) {
@@ -24,10 +24,10 @@ public final class Category {
         String capitalizedName = trimmedName.substring(0, 1).toUpperCase()
                                 + trimmedName.substring(1).toLowerCase();
 
-        if (!CACHE.containsKey(capitalizedName)) {
-            CACHE.put(capitalizedName, new Category(capitalizedName));
+        if (!category.containsKey(capitalizedName)) {
+            category.put(capitalizedName, new Category(capitalizedName));
         }
-        return CACHE.get(capitalizedName);
+        return category.get(capitalizedName);
     }
 
     public String getName() {

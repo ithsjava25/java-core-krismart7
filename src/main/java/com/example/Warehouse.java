@@ -85,6 +85,7 @@ public class Warehouse {
     public void remove(UUID id) {
         productsById.remove(id);
         changedProducts.remove(id);
+        productList.removeIf(p -> p.uuid().equals(id));
     }
 
     public void clearProducts() {
