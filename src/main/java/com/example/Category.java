@@ -18,11 +18,13 @@ public final class Category {
     public static Category of(String name) {
         if (name == null) throw new IllegalArgumentException("Category name can't be null");
 
-        String key = name.trim();
-        if (key.isEmpty()) throw new IllegalArgumentException("Category name can't be blank");
-        key = key.substring(0, 1).toUpperCase() + key.substring(1).toLowerCase();
+        String trimmed = name.trim();
+        if (trimmed.isEmpty()) throw new IllegalArgumentException("Category name can't be blank");
 
-        return category.computeIfAbsent(key, Category::new);
+        String normalized = Character.toUpperCase(trimmed.charAt(0))
+                + trimmed.substring(1).toLowerCase();
+
+        return category.computeIfAbsent(normalized, Category::new);
     }
 
     public String getName() { return name; }
