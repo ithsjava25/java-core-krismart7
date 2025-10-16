@@ -144,40 +144,31 @@ class WarehouseAnalyzer {
      * @param standardDeviations threshold in standard deviations (e.g., 2.0)
      * @return list of products considered outliers
      */
-    public List<Product> findPriceOutliers(double standardDeviations) {
+    public List<Product> findPriceOutliers(double factor) {
         List<Product> products = warehouse.getProducts();
         int n = products.size();
         if (n == 0) return List.of();
-        double sum = products.stream().map(Product::price).mapToDouble(bd -> bd.doubleValue()).sum();
-        double mean = sum / n;
-        double variance = products.stream()
+
+        List<BigDecimal> sortedPrices = products.stream()
                 .map(Product::price)
-                .mapToDouble(bd -> Math.pow(bd.doubleValue() - mean, 2))
-                .sum() / n;
-        double std = Math.sqrt(variance);
-        double threshold = standardDeviations * std;
-        List<Product> outliers = new ArrayList<>();
-        for (Product p : products) {
-            double diff = Math.abs(p.price().doubleValue() - mean);
-            if (diff > threshold) outliers.add(p);
-        }
+                .sorted()
+                .toList();
 
-            Product cheap = products.get(0);
-            Product expensive = products.get(0);
-            for (Product p : products) {
-                if (p.price().doubleValue() < cheap.price().doubleValue()) {
-                    cheap = p;
-                }
-                if (p.price().doubleValue() > expensive.price().doubleValue()) {
-                    expensive = p;
-                }
-            }
+        double q1 = sortedPrices.get(n / 4).doubleValue();
+        double q3 = sortedPrices.get(3 * n / 4).doubleValue();
 
-            if (!outliers.contains(cheap)) outliers.add(cheap);
-            if (!outliers.contains(expensive)) outliers.add(expensive);
+        double iqr = q3 - q1;
+        double lowerBound = q1 - factor * iqr;
+        double upperBound = q3 + factor * iqr;
 
-        return outliers;
+        return products.stream()
+                .filter(p -> {
+                    double price = p.price().doubleValue();
+                    return price < lowerBound || price > upperBound;
+                })
+                .collect(Collectors.toList());
     }
+
 
     /**
      * Groups all shippable products into ShippingGroup buckets such that each group's total weight

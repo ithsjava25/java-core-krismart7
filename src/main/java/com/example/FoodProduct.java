@@ -22,8 +22,8 @@ public class FoodProduct extends Product implements Perishable, Shippable {
 
     @Override
     public LocalDate expirationDate() { return expirationDate; }
-    @Override
 
+    @Override
     public double weight() { return weight.doubleValue(); }
 
     @Override

@@ -2,6 +2,7 @@ package com.example;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Warehouse {
     // Singleton per namn: namn-nyckel → unik Warehouse-instans
@@ -14,6 +15,8 @@ public class Warehouse {
     // Spårar ändrade produkter - Set för unika ID:n
     private final Set<UUID> changedProducts = new HashSet<>();
 
+    private final List<Product> productList = new ArrayList<>();
+
     // Kontrollerad instansiering via getInstance
     private Warehouse(String name) {
         this.name = name;
@@ -24,12 +27,16 @@ public class Warehouse {
         return unique.computeIfAbsent(name, Warehouse::new);
     }
 
+    public static Warehouse getInstance() {
+        return getInstance("default");
+    }
+
     public String getName() {
         return name;
     }
 
     public List<Product> getProducts() {
-        return Collections.unmodifiableList(new ArrayList<>(productsById.values()));
+        return Collections.unmodifiableList(productList);
     }
 
     public Set<UUID> getChangedProducts() {
@@ -40,7 +47,11 @@ public class Warehouse {
         if (product == null) {
             throw new IllegalArgumentException("Product cannot be null.");
         }
+        if (productsById.containsKey(product.uuid())) {
+            throw new IllegalArgumentException("Product with that id already exists, use updateProduct for updates.");
+        }
         productsById.put(product.uuid(), product);
+        productList.add(product);
     }
 
     public Optional<Product> getProductById(UUID id) {
@@ -57,23 +68,18 @@ public class Warehouse {
     }
 
     public List<Perishable> expiredProducts() {
-        List<Perishable> expiredProducts = new ArrayList<>();
-        for (Product p : productsById.values()) {
-            if (p instanceof Perishable perishable && perishable.isExpired()) {
-                expiredProducts.add(perishable);
-            }
-        }
-        return expiredProducts;
+        return productList.stream()
+                .filter(p -> p instanceof Perishable)
+                .map(p -> (Perishable) p)
+                .filter(Perishable::isExpired)
+                .toList();
     }
 
     public List<Shippable> shippableProducts() {
-        List<Shippable> shippableProducts = new ArrayList<>();
-        for (Product p : productsById.values()) {
-            if (p instanceof Shippable shippable) {
-                shippableProducts.add(shippable);
-            }
-        }
-        return shippableProducts;
+        return productList.stream()
+                .filter(p -> p instanceof Shippable)
+                .map(p -> (Shippable) p)
+                .toList();
     }
 
     public void remove(UUID id) {
@@ -84,18 +90,16 @@ public class Warehouse {
     public void clearProducts() {
         productsById.clear();
         changedProducts.clear();
+        productList.clear();
     }
 
     public boolean isEmpty() {
-        return productsById.isEmpty();
+        return productList.isEmpty();
     }
 
     public Map<Category, List<Product>> getProductsGroupedByCategories() {
-        Map<Category, List<Product>> grouped = new HashMap<>();
-        for (Product p : productsById.values()) {
-            grouped.computeIfAbsent(p.category(), k -> new ArrayList<>()).add(p);
-        }
-        return grouped;
+        return productList.stream()
+                .collect(Collectors.groupingBy(Product::category));
     }
 
     @Override
