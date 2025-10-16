@@ -36,7 +36,7 @@ public class Warehouse {
     }
 
     public List<Product> getProducts() {
-        return Collections.unmodifiableList(productList);
+        return List.copyOf(productList);
     }
 
     public Set<UUID> getChangedProducts() {
