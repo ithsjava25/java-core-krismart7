@@ -9,6 +9,8 @@ public class FoodProduct extends Product implements Perishable, Shippable {
     private final LocalDate expirationDate;
     private final BigDecimal weight;
 
+    private static final BigDecimal SHIPPING_PER_KG = new BigDecimal("50");
+
     public FoodProduct(UUID id, String name, Category category, BigDecimal price, LocalDate expirationDate, BigDecimal weight) {
         super(id, name, category, price);
 
@@ -17,7 +19,7 @@ public class FoodProduct extends Product implements Perishable, Shippable {
         if (expirationDate == null) { throw new IllegalArgumentException("Expiration date cannot be null."); }
 
         this.expirationDate = expirationDate;
-        this.weight = weight;
+        this.weight = weight.setScale(2, RoundingMode.HALF_UP);
     }
 
     @Override
@@ -31,7 +33,7 @@ public class FoodProduct extends Product implements Perishable, Shippable {
 
     @Override
     public BigDecimal calculateShippingCost() {
-        return weight.multiply(BigDecimal.valueOf(50)).setScale(2, RoundingMode.HALF_UP);
+        return weight.multiply(SHIPPING_PER_KG).setScale(2, RoundingMode.HALF_UP);
     }
 
     @Override
