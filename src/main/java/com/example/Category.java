@@ -16,23 +16,16 @@ public final class Category {
 
     // Skapar/återanvänder Category-instans (factory)
     public static Category of(String name) {
-        if (name == null) { throw new IllegalArgumentException("Category name can't be null"); }
+        if (name == null) throw new IllegalArgumentException("Category name can't be null");
 
-        String trimmedName = name.trim();
-        if (trimmedName.isEmpty()) { throw new IllegalArgumentException("Category name can't be blank"); }
+        String key = name.trim();
+        if (key.isEmpty()) throw new IllegalArgumentException("Category name can't be blank");
+        key = key.substring(0, 1).toUpperCase() + key.substring(1).toLowerCase();
 
-        String capitalizedName = trimmedName.substring(0, 1).toUpperCase()
-                                + trimmedName.substring(1).toLowerCase();
-
-        if (!category.containsKey(capitalizedName)) {
-            category.put(capitalizedName, new Category(capitalizedName));
-        }
-        return category.get(capitalizedName);
+        return category.computeIfAbsent(key, Category::new);
     }
 
-    public String getName() {
-        return name;
-    }
+    public String getName() { return name; }
 
     @Override
     public boolean equals(Object o) {
@@ -42,12 +35,8 @@ public final class Category {
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hashCode(name);
-    }
+    public int hashCode() { return Objects.hashCode(name); }
 
     @Override
-    public String toString() {
-        return "Category{" + "name='" + name + '\'' + '}';
-    }
+    public String toString() { return "Category{" + "name='" + name + '\'' + '}'; }
 }
