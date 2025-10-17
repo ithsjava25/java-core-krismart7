@@ -144,26 +144,42 @@ class WarehouseAnalyzer {
      * @param standardDeviations threshold in standard deviations (e.g., 2.0)
      * @return list of products considered outliers
      */
-    public List<Product> findPriceOutliers(double standardDeviations) {
+    public List<Product> findAllPriceOutliers(double factor) {
         List<Product> products = warehouse.getProducts();
         int n = products.size();
         if (n == 0) return List.of();
-        double sum = products.stream().map(Product::price).mapToDouble(bd -> bd.doubleValue()).sum();
-        double mean = sum / n;
-        double variance = products.stream()
-                .map(Product::price)
-                .mapToDouble(bd -> Math.pow(bd.doubleValue() - mean, 2))
-                .sum() / n;
-        double std = Math.sqrt(variance);
-        double threshold = standardDeviations * std;
-        List<Product> outliers = new ArrayList<>();
-        for (Product p : products) {
-            double diff = Math.abs(p.price().doubleValue() - mean);
-            if (diff > threshold) outliers.add(p);
-        }
-        return outliers;
-    }
 
+        // Extract prices and sort them in ascending order
+        // Sorting is necessary to calculate quartiles (Q1, Q3)
+        List<BigDecimal> sortedPrices = products.stream()
+                .map(Product::price)
+                .sorted()
+                .toList();
+
+        // Calculate quartiles
+        // Q1 = value at the 25% position in the sorted list
+        // Q3 = value at the 75% position in the sorted list
+        double q1 = sortedPrices.get(n / 4).doubleValue();
+        double q3 = sortedPrices.get(3 * n / 4).doubleValue();
+
+        // Calculate the interquartile range (IQR)
+        // IQR represents the spread of the middle 50% of all prices
+        double iqr = q3 - q1;
+
+        // Define bounds for outliers
+        // Anything below lowerBound or above upperBound is considered an outlier
+        // The factor (for example 1.5 or 2.0) controls how strict the rule is
+        double lowerBound = q1 - factor * iqr;
+        double upperBound = q3 + factor * iqr;
+
+        // Filter and return products that are outside these bounds
+        return products.stream()
+                .filter(p -> {
+                    double price = p.price().doubleValue();
+                    return price < lowerBound || price > upperBound;
+                })
+                .toList();
+    }
 
     /**
      * Groups all shippable products into ShippingGroup buckets such that each group's total weight
@@ -177,13 +193,11 @@ class WarehouseAnalyzer {
     public List<ShippingGroup> optimizeShippingGroups(BigDecimal maxWeightPerGroup) {
         double maxW = maxWeightPerGroup.doubleValue();
 
-        // Hämta shippable produkter i sorterad ordning (tyngst först)
         List<Shippable> items = new ArrayList<>(warehouse.shippableProducts());
 
         items.sort((a, b) -> Double.compare
                 (Objects.requireNonNullElse(b.weight(), 0.0),
                 Objects.requireNonNullElse(a.weight(), 0.0)));
-
 
         List<List<Shippable>> bins = new ArrayList<>();
         for (Shippable item : items) {
