@@ -144,29 +144,24 @@ class WarehouseAnalyzer {
      * @param standardDeviations threshold in standard deviations (e.g., 2.0)
      * @return list of products considered outliers
      */
-    public List<Product> findPriceOutliers(double factor) {
+    public List<Product> findPriceOutliers(double standardDeviations) {
         List<Product> products = warehouse.getProducts();
         int n = products.size();
         if (n == 0) return List.of();
-
-        List<BigDecimal> sortedPrices = products.stream()
+        double sum = products.stream().map(Product::price).mapToDouble(bd -> bd.doubleValue()).sum();
+        double mean = sum / n;
+        double variance = products.stream()
                 .map(Product::price)
-                .sorted()
-                .toList();
-
-        double q1 = sortedPrices.get(n / 4).doubleValue();
-        double q3 = sortedPrices.get(3 * n / 4).doubleValue();
-
-        double iqr = q3 - q1;
-        double lowerBound = q1 - factor * iqr;
-        double upperBound = q3 + factor * iqr;
-
-        return products.stream()
-                .filter(p -> {
-                    double price = p.price().doubleValue();
-                    return price < lowerBound || price > upperBound;
-                })
-                .collect(Collectors.toList());
+                .mapToDouble(bd -> Math.pow(bd.doubleValue() - mean, 2))
+                .sum() / n;
+        double std = Math.sqrt(variance);
+        double threshold = standardDeviations * std;
+        List<Product> outliers = new ArrayList<>();
+        for (Product p : products) {
+            double diff = Math.abs(p.price().doubleValue() - mean);
+            if (diff > threshold) outliers.add(p);
+        }
+        return outliers;
     }
 
 
@@ -181,13 +176,9 @@ class WarehouseAnalyzer {
      */
     public List<ShippingGroup> optimizeShippingGroups(BigDecimal maxWeightPerGroup) {
         double maxW = maxWeightPerGroup.doubleValue();
-        List<Shippable> items = new ArrayList<>(warehouse.shippableProducts());
-
-        items.sort((a, b) -> Double.compare(
-                Objects.requireNonNullElse(b.weight(), 0.0),
-                Objects.requireNonNullElse(a.weight(), 0.0)
-        ));
-
+        List<Shippable> items = warehouse.shippableProducts();
+        // Sort by descending weight (First-Fit Decreasing)
+        items.sort((a, b) -> Double.compare(Objects.requireNonNullElse(b.weight(), 0.0), Objects.requireNonNullElse(a.weight(), 0.0)));
         List<List<Shippable>> bins = new ArrayList<>();
         for (Shippable item : items) {
             double w = Objects.requireNonNullElse(item.weight(), 0.0);
@@ -206,7 +197,6 @@ class WarehouseAnalyzer {
                 bins.add(newBin);
             }
         }
-
         List<ShippingGroup> groups = new ArrayList<>();
         for (List<Shippable> bin : bins) groups.add(new ShippingGroup(bin));
         return groups;
