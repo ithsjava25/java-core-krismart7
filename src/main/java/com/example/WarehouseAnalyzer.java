@@ -159,25 +159,22 @@ class WarehouseAnalyzer {
         // Calculate quartiles
         // Q1 = value at the 25% position in the sorted list
         // Q3 = value at the 75% position in the sorted list
-        double q1 = sortedPrices.get(n / 4).doubleValue();
-        double q3 = sortedPrices.get(3 * n / 4).doubleValue();
+        BigDecimal q1 = sortedPrices.get(n / 4);
+        BigDecimal q3 = sortedPrices.get(3 * n / 4);
 
         // Calculate the interquartile range (IQR)
         // IQR represents the spread of the middle 50% of all prices
-        double iqr = q3 - q1;
+        BigDecimal iqr = q3.subtract(q1);
 
         // Define bounds for outliers
         // Anything below lowerBound or above upperBound is considered an outlier
         // The factor (for example 1.5 or 2.0) controls how strict the rule is
-        double lowerBound = q1 - factor * iqr;
-        double upperBound = q3 + factor * iqr;
+        BigDecimal lowerBound = q1.subtract(iqr.multiply(BigDecimal.valueOf(factor)));
+        BigDecimal upperBound = q3.add(iqr.multiply(BigDecimal.valueOf(factor)));
 
         // Filter and return products that are outside these bounds
         return products.stream()
-                .filter(p -> {
-                    double price = p.price().doubleValue();
-                    return price < lowerBound || price > upperBound;
-                })
+                .filter(p -> p.price().compareTo(lowerBound) < 0 || p.price().compareTo(upperBound) > 0)
                 .toList();
     }
 

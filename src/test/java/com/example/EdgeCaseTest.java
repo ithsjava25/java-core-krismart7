@@ -240,7 +240,8 @@ class EdgeCaseTest {
             assertThat(outliers)
                     .as("Should identify statistical outliers including original Expensive and Cheap")
                     .extracting(Product::name)
-                    .contains("Expensive", "Cheap");
+                    .contains("Expensive", "Cheap")
+            .doesNotContain("HighMid", "LowMid");
         }
 
         @Test
