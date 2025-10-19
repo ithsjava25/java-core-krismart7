@@ -6,21 +6,18 @@ import java.util.Objects;
 
 public final class Category {
 
-    // Flyweight-cache: normaliserat namn → unik Category-instans
     private static final Map<String, Category> category = new HashMap<>();
     private final String name;
-    // Endast instanser via of() (flyweight/factory-mönster)
+
     private Category(String name) {
         this.name = name;
     }
 
-    // Skapar/återanvänder Category-instans (factory)
     public static Category of(String name) {
         if (name == null) throw new IllegalArgumentException("Category name can't be null");
+        if (name.isBlank()) { throw new IllegalArgumentException("Category name can't be blank"); }
 
         String trimmed = name.trim();
-        if (trimmed.isEmpty()) throw new IllegalArgumentException("Category name can't be blank");
-
         String normalized = Character.toUpperCase(trimmed.charAt(0))
                 + trimmed.substring(1).toLowerCase();
 

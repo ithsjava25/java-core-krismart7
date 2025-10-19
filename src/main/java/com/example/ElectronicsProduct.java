@@ -19,7 +19,7 @@ public class ElectronicsProduct extends Product implements Shippable {
         if (weight == null || weight.compareTo(BigDecimal.ZERO) < 0) { throw new IllegalArgumentException("Weight cannot be null or negative"); }
 
         this.warrantyMonths = warrantyMonths;
-        this.weight = weight;
+        this.weight = weight.setScale(2, RoundingMode.HALF_UP);
     }
 
     @Override

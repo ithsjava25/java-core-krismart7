@@ -35,6 +35,8 @@ public abstract class Product {
         this.price = newPrice.setScale(2, RoundingMode.HALF_UP);
     }
 
+    public abstract String productDetails();
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -56,6 +58,4 @@ public abstract class Product {
                 ", price=" + price +
                 '}';
     }
-
-    public abstract String productDetails();
 }
