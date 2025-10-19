@@ -5,10 +5,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Warehouse {
-    private static final Map<String, Warehouse> unique = new HashMap<>();
-    private final Map<UUID, Product> productsById = new HashMap<>();
-    private final List<Product> productList = new ArrayList<>();
-    private final Set<UUID> changedProducts = new HashSet<>();
+    private static final Map<String, Warehouse> WAREHOUSES_BY_NAME = new HashMap<>();
+    private final Map<UUID, Product> PRODUCTS_BY_ID = new HashMap<>();
+    private final List<Product> PRODUCT_LIST = new ArrayList<>();
+    private final Set<UUID> CHANGED_PRODUCT_IDS = new HashSet<>();
     private final String name;
 
 
@@ -17,7 +17,7 @@ public class Warehouse {
     }
 
     public static Warehouse getInstance(String name) {
-        return unique.computeIfAbsent(name, Warehouse::new);
+        return WAREHOUSES_BY_NAME.computeIfAbsent(name, Warehouse::new);
     }
 
     public static Warehouse getInstance() {
@@ -29,34 +29,34 @@ public class Warehouse {
     }
 
     public List<Product> getProducts() {
-        return List.copyOf(productList);
+        return List.copyOf(PRODUCT_LIST);
     }
 
     public Set<UUID> getChangedProducts() {
-        return Set.copyOf(changedProducts);
+        return Set.copyOf(CHANGED_PRODUCT_IDS);
     }
 
     public void addProduct(Product product) {
         if (product == null) {
             throw new IllegalArgumentException("Product cannot be null.");
         }
-        if (productsById.containsKey(product.uuid())) {
+        if (PRODUCTS_BY_ID.containsKey(product.uuid())) {
             throw new IllegalArgumentException("Product with that id already exists, use updateProduct for updates.");
         }
-        productsById.put(product.uuid(), product);
-        productList.add(product);
+        PRODUCTS_BY_ID.put(product.uuid(), product);
+        PRODUCT_LIST.add(product);
     }
 
     public Optional<Product> getProductById(UUID id) {
-        return Optional.ofNullable(productsById.get(id));
+        return Optional.ofNullable(PRODUCTS_BY_ID.get(id));
     }
 
     public void updateProductPrice(UUID id, BigDecimal newPrice) {
-        Optional.ofNullable(productsById.get(id))
+        Optional.ofNullable(PRODUCTS_BY_ID.get(id))
                 .ifPresentOrElse(
                         p -> {
                             p.setPrice(newPrice);
-                            changedProducts.add(id); },
+                            CHANGED_PRODUCT_IDS.add(id); },
                         () -> {
                             throw new NoSuchElementException("Product not found with id: " + id);
                         }
@@ -64,39 +64,39 @@ public class Warehouse {
     }
 
     public List<Perishable> expiredProducts() {
-        return productList.stream()
+        return PRODUCT_LIST.stream()
                 .filter(p -> p instanceof Perishable perishable && perishable.isExpired())
                 .map(p -> (Perishable) p)
                 .toList();
     }
 
     public List<Shippable> shippableProducts() {
-        return productList.stream()
+        return PRODUCT_LIST.stream()
                 .filter(p -> p instanceof Shippable s)
                 .map(s -> (Shippable) s)
                 .toList();
     }
 
     public void remove(UUID id) {
-        Optional.ofNullable(productsById.remove(id))
+        Optional.ofNullable(PRODUCTS_BY_ID.remove(id))
                 .ifPresent(p -> {
-                    changedProducts.remove(id);
-                    productList.remove(p);
+                    CHANGED_PRODUCT_IDS.remove(id);
+                    PRODUCT_LIST.remove(p);
                 });
     }
 
     public void clearProducts() {
-        productsById.clear();
-        changedProducts.clear();
-        productList.clear();
+        PRODUCTS_BY_ID.clear();
+        CHANGED_PRODUCT_IDS.clear();
+        PRODUCT_LIST.clear();
     }
 
     public boolean isEmpty() {
-        return productList.isEmpty();
+        return PRODUCT_LIST.isEmpty();
     }
 
     public Map<Category, List<Product>> getProductsGroupedByCategories() {
-        return productList.stream()
+        return PRODUCT_LIST.stream()
                 .collect(Collectors.groupingBy(
                         Product::category,
                         Collectors.collectingAndThen(Collectors.toList(), List::copyOf)
@@ -117,6 +117,6 @@ public class Warehouse {
 
     @Override
     public String toString() {
-        return "Warehouse{" + "name='" + name + '\'' + ", productsById=" + productsById + ", changedProducts=" + changedProducts + '}';
+        return "Warehouse{" + "name='" + name + '\'' + ", productsById=" + PRODUCTS_BY_ID + ", changedProducts=" + CHANGED_PRODUCT_IDS + '}';
     }
 }

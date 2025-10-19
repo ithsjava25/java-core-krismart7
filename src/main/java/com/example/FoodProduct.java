@@ -9,7 +9,7 @@ public class FoodProduct extends Product implements Perishable, Shippable {
     private final LocalDate expirationDate;
     private final BigDecimal weight;
 
-    private static final BigDecimal SHIPPING_PER_KG = new BigDecimal("50");
+    private static final BigDecimal SHIPPING_PER_KG = new BigDecimal(50);
 
     public FoodProduct(UUID id, String name, Category category, BigDecimal price, LocalDate expirationDate, BigDecimal weight) {
         super(id, name, category, price);

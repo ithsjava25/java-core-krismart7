@@ -6,7 +6,7 @@ import java.util.Objects;
 
 public final class Category {
 
-    private static final Map<String, Category> category = new HashMap<>();
+    private static final Map<String, Category> FLYWEIGHT_MAP = new HashMap<>();
     private final String name;
 
     private Category(String name) {
@@ -21,7 +21,7 @@ public final class Category {
         String normalized = Character.toUpperCase(trimmed.charAt(0))
                 + trimmed.substring(1).toLowerCase();
 
-        return category.computeIfAbsent(normalized, Category::new);
+        return FLYWEIGHT_MAP.computeIfAbsent(normalized, Category::new);
     }
 
     public String getName() { return name; }
