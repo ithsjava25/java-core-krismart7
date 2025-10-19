@@ -5,24 +5,17 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Warehouse {
-    // Singleton per namn: namn-nyckel → unik Warehouse-instans
     private static final Map<String, Warehouse> unique = new HashMap<>();
+    private final Map<UUID, Product> productsById = new HashMap<>();
+    private final List<Product> productList = new ArrayList<>();
+    private final Set<UUID> changedProducts = new HashSet<>();
     private final String name;
 
-    // Produkter per UUID
-    private final Map<UUID, Product> productsById = new HashMap<>();
 
-    // Spårar ändrade produkter - Set för unika ID:n
-    private final Set<UUID> changedProducts = new HashSet<>();
-
-    private final List<Product> productList = new ArrayList<>();
-
-    // Kontrollerad instansiering via getInstance
     private Warehouse(String name) {
         this.name = name;
     }
 
-    // Returnerar samma instans för samma namn, skapar ny om saknas
     public static Warehouse getInstance(String name) {
         return unique.computeIfAbsent(name, Warehouse::new);
     }
@@ -40,7 +33,7 @@ public class Warehouse {
     }
 
     public Set<UUID> getChangedProducts() {
-        return Collections.unmodifiableSet(changedProducts);
+        return Set.copyOf(changedProducts);
     }
 
     public void addProduct(Product product) {
@@ -59,33 +52,37 @@ public class Warehouse {
     }
 
     public void updateProductPrice(UUID id, BigDecimal newPrice) {
-        Product product = productsById.get(id);
-        if (product == null) {
-            throw new NoSuchElementException("Product not found with id: " + id);
-        }
-        product.setPrice(newPrice);
-        changedProducts.add(id);
+        Optional.ofNullable(productsById.get(id))
+                .ifPresentOrElse(
+                        p -> {
+                            p.setPrice(newPrice);
+                            changedProducts.add(id); },
+                        () -> {
+                            throw new NoSuchElementException("Product not found with id: " + id);
+                        }
+                );
     }
 
     public List<Perishable> expiredProducts() {
         return productList.stream()
-                .filter(p -> p instanceof Perishable)
+                .filter(p -> p instanceof Perishable perishable && perishable.isExpired())
                 .map(p -> (Perishable) p)
-                .filter(Perishable::isExpired)
                 .toList();
     }
 
     public List<Shippable> shippableProducts() {
         return productList.stream()
-                .filter(p -> p instanceof Shippable)
-                .map(p -> (Shippable) p)
+                .filter(p -> p instanceof Shippable s)
+                .map(s -> (Shippable) s)
                 .toList();
     }
 
     public void remove(UUID id) {
-        productsById.remove(id);
-        changedProducts.remove(id);
-        productList.removeIf(p -> p.uuid().equals(id));
+        Optional.ofNullable(productsById.remove(id))
+                .ifPresent(p -> {
+                    changedProducts.remove(id);
+                    productList.remove(p);
+                });
     }
 
     public void clearProducts() {
@@ -100,7 +97,10 @@ public class Warehouse {
 
     public Map<Category, List<Product>> getProductsGroupedByCategories() {
         return productList.stream()
-                .collect(Collectors.groupingBy(Product::category));
+                .collect(Collectors.groupingBy(
+                        Product::category,
+                        Collectors.collectingAndThen(Collectors.toList(), List::copyOf)
+                ));
     }
 
     @Override
