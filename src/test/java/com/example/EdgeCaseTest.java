@@ -232,7 +232,6 @@ class EdgeCaseTest {
             warehouse.addProduct(highMidNoOutlier);
             warehouse.addProduct(lowMidNoOutlier);
 
-
             // Act - Detect outliers using IQR factor 2.0
             List<Product> outliers = analyzer.findAllPriceOutliers(2.0);
 
