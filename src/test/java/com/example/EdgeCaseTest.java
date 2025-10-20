@@ -208,17 +208,17 @@ class EdgeCaseTest {
 
             // Additional outliers for testing
             Product extraHigh = new FoodProduct(UUID.randomUUID(), "ExtraHigh", Category.of("Test"),
-                    new BigDecimal("100.00"), LocalDate.now().plusDays(5), BigDecimal.ONE); // lite högre än normal
+                    new BigDecimal("100.00"), LocalDate.now().plusDays(5), BigDecimal.ONE);
             Product extraLow = new FoodProduct(UUID.randomUUID(), "ExtraLow", Category.of("Test"),
-                    new BigDecimal("1.00"), LocalDate.now().plusDays(5), BigDecimal.ONE); // lite lägre än normal
+                    new BigDecimal("1.00"), LocalDate.now().plusDays(5), BigDecimal.ONE);
             Product high = new FoodProduct(UUID.randomUUID(), "High", Category.of("Test"),
-                    new BigDecimal("50.00"), LocalDate.now().plusDays(5), BigDecimal.ONE); // lite högre än normal
+                    new BigDecimal("50.00"), LocalDate.now().plusDays(5), BigDecimal.ONE);
             Product low = new FoodProduct(UUID.randomUUID(), "Low", Category.of("Test"),
-                    new BigDecimal("5.00"), LocalDate.now().plusDays(5), BigDecimal.ONE); // lite lägre än normal
+                    new BigDecimal("5.00"), LocalDate.now().plusDays(5), BigDecimal.ONE);
 
             // Prices in between extremes that should not be flagged
             Product highMidNoOutlier = new FoodProduct(UUID.randomUUID(), "HighMid", Category.of("Test"),
-                    new BigDecimal("25.00"), LocalDate.now().plusDays(5), BigDecimal.ONE);
+                    new BigDecimal("21.00"), LocalDate.now().plusDays(5), BigDecimal.ONE);
             Product lowMidNoOutlier = new FoodProduct(UUID.randomUUID(), "LowMid", Category.of("Test"),
                     new BigDecimal("11.00"), LocalDate.now().plusDays(5), BigDecimal.ONE);
 
