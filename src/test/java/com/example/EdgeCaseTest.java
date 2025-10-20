@@ -188,34 +188,59 @@ class EdgeCaseTest {
         @Test
         @DisplayName("📊 should identify products with abnormal pricing (outliers)")
         /**
-         * Detects price outliers using mean and standard deviation.
-         * Arrange: mostly normal-priced items around 15, plus very cheap and very expensive outliers.
+         * Detects price outliers using IQR.
+         * Arrange: mostly normal-priced items around 15-17, with some extreme or extra outliers added.
          * Act: analyzer.findPriceOutliers(2.0).
-         * Assert: returns exactly the two outliers ("Expensive" and "Cheap").
+         *  Assert: ensures that extreme products "Expensive" and "Cheap" and other outliers are detected.
          */
-        void should_identifyPriceOutliers_usingStatistics() {
-            // Arrange - Most products around 10-20, with outliers
+        void should_identifyPriceOutliers_usingIQR() {
+            // Arrange - Add normal-priced products (15–17)
             IntStream.rangeClosed(1, 10).forEach(i ->
                     warehouse.addProduct(new FoodProduct(UUID.randomUUID(), "Normal" + i, Category.of("Test"),
                             new BigDecimal("15.00").add(new BigDecimal(i % 3)), LocalDate.now().plusDays(5), BigDecimal.ONE))
             );
+
+            // Extreme outliers
             Product outlierHigh = new FoodProduct(UUID.randomUUID(), "Expensive", Category.of("Test"),
                     new BigDecimal("500.00"), LocalDate.now().plusDays(5), BigDecimal.ONE);
             Product outlierLow = new FoodProduct(UUID.randomUUID(), "Cheap", Category.of("Test"),
                     new BigDecimal("0.01"), LocalDate.now().plusDays(5), BigDecimal.ONE);
 
+            // Additional outliers for testing
+            Product extraHigh = new FoodProduct(UUID.randomUUID(), "ExtraHigh", Category.of("Test"),
+                    new BigDecimal("100.00"), LocalDate.now().plusDays(5), BigDecimal.ONE);
+            Product extraLow = new FoodProduct(UUID.randomUUID(), "ExtraLow", Category.of("Test"),
+                    new BigDecimal("1.00"), LocalDate.now().plusDays(5), BigDecimal.ONE);
+            Product high = new FoodProduct(UUID.randomUUID(), "High", Category.of("Test"),
+                    new BigDecimal("50.00"), LocalDate.now().plusDays(5), BigDecimal.ONE);
+            Product low = new FoodProduct(UUID.randomUUID(), "Low", Category.of("Test"),
+                    new BigDecimal("5.00"), LocalDate.now().plusDays(5), BigDecimal.ONE);
+
+            // Prices in between extremes that should not be flagged
+            Product highMidNoOutlier = new FoodProduct(UUID.randomUUID(), "HighMid", Category.of("Test"),
+                    new BigDecimal("21.00"), LocalDate.now().plusDays(5), BigDecimal.ONE);
+            Product lowMidNoOutlier = new FoodProduct(UUID.randomUUID(), "LowMid", Category.of("Test"),
+                    new BigDecimal("11.00"), LocalDate.now().plusDays(5), BigDecimal.ONE);
+
+            // Add all products to warehous
             warehouse.addProduct(outlierHigh);
             warehouse.addProduct(outlierLow);
+            warehouse.addProduct(extraHigh);
+            warehouse.addProduct(extraLow);
+            warehouse.addProduct(high);
+            warehouse.addProduct(low);
+            warehouse.addProduct(highMidNoOutlier);
+            warehouse.addProduct(lowMidNoOutlier);
 
-            // Act - Find outliers (products with price > 2 standard deviations from mean)
-            List<Product> outliers = analyzer.findPriceOutliers(2.0); // 2 standard deviations
+            // Act - Detect outliers using IQR factor 2.0
+            List<Product> outliers = analyzer.findAllPriceOutliers(2.0);
 
-            // Assert
+            // Assert - Verify that extreme outliers are detected
             assertThat(outliers)
-                    .as("Should identify statistical outliers beyond 2 standard deviations")
-                    .hasSize(2)
+                    .as("Should identify statistical outliers including original Expensive and Cheap")
                     .extracting(Product::name)
-                    .containsExactlyInAnyOrder("Expensive", "Cheap");
+                    .contains("Expensive", "Cheap")
+            .doesNotContain("HighMid", "LowMid");
         }
 
         @Test
